@@ -2,60 +2,67 @@
 
 > *Trop de pub tue la pub.*
 
-Mute Spotify ads automatically on Windows. Per-app mute via the Windows Audio
-Session API — only Spotify gets silenced, everything else keeps playing.
+🇬🇧 [Read in English](README.en.md)
+
+Coupe automatiquement le son des pubs Spotify sous Windows. Mute par
+application via la Windows Audio Session API — seul Spotify est silencé,
+tout le reste continue de jouer normalement.
 
 ![logo](Logo.png)
 
-## How it works
+## Comment ça marche
 
-- **Detection** — Windows exposes media metadata for any playing app via
-  the SMTC (`Windows.Media.Control`). SpotiFade subscribes to the Spotify
-  session's `MediaPropertiesChanged` and inspects title/artist/album. Ads
-  are flagged when one of those contains a localized ad keyword
-  (`Advertisement`, `Annonce`, `Werbung`, `广告`, …).
-- **Mute** — when an ad is detected, the Spotify audio session is found
-  via WASAPI (`AudioSessionManager` → match by process name `Spotify.exe`)
-  and `SimpleAudioVolume.Mute` is flipped. As soon as the next track
-  starts, the mute is released.
-- **Tray-only** — runs as a single-instance NotifyIcon. Right-click for
-  status / quit. No console window.
+- **Détection** — Windows expose les metadata media de toute app en
+  cours de lecture via le SMTC (`Windows.Media.Control`). SpotiFade
+  s'abonne au `MediaPropertiesChanged` de la session Spotify et inspecte
+  titre / artiste / album. Une pub est détectée si :
+  - `artist` ou `albumArtist` vaut `Spotify` (auto-promo) ;
+  - le titre est un placeholder (`—`, vide…) avec artist/album vides ;
+  - un mot-clé de pub localisé apparaît (`Annonce`, `Advertisement`,
+    `Werbung`, `广告`, …).
+- **Mute** — la session audio de Spotify est trouvée via WASAPI
+  (`AudioSessionManager` → matching par nom de processus `Spotify.exe`),
+  et `SimpleAudioVolume.Mute` est basculé. Dès que la piste suivante
+  démarre, le mute est levé.
+- **Tray uniquement** — tourne comme NotifyIcon mono-instance. Clic
+  droit pour le statut / quitter. Aucune fenêtre console.
 
-## Requirements
+## Prérequis
 
-- Windows 10 1809 or later (Windows 11 recommended).
-- [.NET 8 SDK](https://dotnet.microsoft.com/download) — only for building.
-  End-users don't need anything pre-installed if you publish a self-contained
-  build (see below).
+- Windows 10 1809 ou plus récent (Windows 11 recommandé).
+- [SDK .NET 8](https://dotnet.microsoft.com/download) — uniquement pour
+  builder. Les utilisateurs finaux n'ont rien à installer si tu publies
+  un build self-contained (voir plus bas).
 
 ## Build
 
 ```powershell
 cd SpotiFade
 dotnet build -c Release
-dotnet run -c Release        # quick test
+dotnet run -c Release        # test rapide
 ```
 
-To produce a single self-contained EXE that runs without .NET installed:
+Pour produire un .exe autonome qui tourne sans .NET installé :
 
 ```powershell
 .\publish.ps1
 ```
 
-The output lands in `publish\SpotiFade.exe` (~70 MB because it bundles the
-runtime). For a smaller framework-dependent build, edit `publish.ps1` and
-drop `--self-contained true` — the end user will then need the .NET 8
-Desktop Runtime.
+Le binaire arrive dans `publish\SpotiFade.exe` (~70 Mo, runtime
+embarqué). Pour un build plus léger dépendant du framework, édite
+`publish.ps1` et retire `--self-contained true` — l'utilisateur final
+devra alors avoir installé le .NET 8 Desktop Runtime.
 
-## Run on startup
+## Lancement au démarrage
 
-Right-click the tray icon → check **Lancer au démarrage**. SpotiFade writes
-the toggle to the per-user Run registry key — no admin privileges needed.
+Clic droit sur l'icône tray → coche **Lancer au démarrage**. SpotiFade
+écrit le toggle dans la clé Run par utilisateur du registre — aucun
+privilège admin requis.
 
-For a portable install, drop `SpotiFade.exe` anywhere (e.g.
-`%LOCALAPPDATA%\SpotiFade\`) before enabling auto-start, otherwise the
-registry will point at a path that may move.
+Pour une install portable, place `SpotiFade.exe` quelque part de stable
+(ex. `%LOCALAPPDATA%\SpotiFade\`) **avant** d'activer l'auto-démarrage,
+sinon le registre pointera vers un chemin susceptible de bouger.
 
-## License
+## Licence
 
-MIT — see `LICENSE`.
+MIT — voir `LICENSE`.
