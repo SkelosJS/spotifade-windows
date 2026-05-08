@@ -39,7 +39,7 @@ le reste continue de jouer normalement.
 ## Build
 
 ```powershell
-git clone https://github.com/skelos9692/spotifade-windows.git
+git clone https://github.com/SkelosJS/spotifade-windows.git
 cd spotifade-windows\SpotiFade
 dotnet build -c Release
 dotnet run -c Release        # test rapide
